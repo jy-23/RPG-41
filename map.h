@@ -32,6 +32,9 @@ class Map {
         else if (map.at(y).at(x) == SAVE) {
             return SAVE;
         }
+        else if (map.at(y).at(x) == APOTHECARY) {
+            return APOTHECARY;
+        }
         else {
             return TREASURE;
         }
@@ -72,6 +75,7 @@ class Map {
     static const size_t SIZE = 100; //World is a 100x100 map
     static const size_t DISPLAY = 30; //Show a 30x30 area at a time
     static const char SAVE = 'S';
+    static const char APOTHECARY = 'A';
     
     //Randomly generate map
     void init_map() {
@@ -85,6 +89,10 @@ class Map {
                 map.at(90).at(90) = SAVE;
                 map.at(90).at(10) = SAVE;
                 map.at(10).at(90) = SAVE;
+                map.at(30).at(70) = APOTHECARY;
+                map.at(40).at(50) = APOTHECARY;
+                map.at(70).at(30) = APOTHECARY;
+                map.at(80).at(70) = APOTHECARY;
 
                 if (i == 0 or j == 0 or i == SIZE-1 or j == SIZE-1)
                     map.at(i).at(j) = WALL;
@@ -92,7 +100,7 @@ class Map {
                     map.at(i).at(j) = HERO;
                 else {
                     //5% chance of monster
-                    if (d100(gen) <= 5) {
+                    if (d100(gen) <= 1) {
                         map.at(i).at(j) = MONSTER;
                     }
                     else if (d100(gen) <= 3) {
@@ -160,6 +168,8 @@ class Map {
                         color = 6;
                     else if (map.at(i).at(j) == SAVE)
                         color = 7;
+                    else if (map.at(i).at(j) == APOTHECARY)
+                        color = 3;
 
                     attron(COLOR_PAIR(color));
                     mvaddch(i-start_y,j-start_x,map.at(i).at(j));
