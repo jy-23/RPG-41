@@ -3,7 +3,8 @@
 #include <iomanip>
 #include <unistd.h>
 #include "Actors.h"
-#include "circLinkedList.h"
+#include "Bridges.h"
+#include "CircDLelement.h"
 
 const int MAX_FPS = 90; //Cap frame rate
 const unsigned int TIMEOUT = 10; //Milliseconds to wait for a getch to finish
