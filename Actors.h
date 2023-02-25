@@ -24,6 +24,7 @@ class Actors {
         bool dead = false;
         string type = "";
         string name = "";
+        int money = 0;
     public:
         Actors() {}
         Actors(int n_speed) : speed(n_speed) {}
@@ -37,15 +38,19 @@ class Actors {
         bool get_dead() const { return dead; }
         string get_type() const { return type; }
         string get_name() const { return name; }
+        int get_money() const { return money; }
         
         //setters
         void set_speed(int new_speed) { speed = new_speed; }
         void set_health(int new_health) {
             if (new_health < 0) health = 0;
+            else if (new_health > 100) health = 100;
             else health = new_health;
         }
+        void set_dead(bool new_dead) { dead = new_dead; }
         void set_attack(int new_attack) { attack_value = new_attack; }
         void set_defense(int new_defense) { defense_value = new_defense; }
+        void set_money(int new_money) { money +=new_money; }
         
         //other functions
         virtual void mark_dead(Combat &newCombat) { dead = true; }
@@ -53,6 +58,7 @@ class Actors {
         virtual int make_move(Actors *opponent) { return 0; }
         virtual void print_stats() const {
             cout << "   Health: " << health << "/100" << endl;
+            cout << "   Speed: " << speed << endl;
             cout << "   Attack Value: " << attack_value << endl;
         }
 };
@@ -64,7 +70,14 @@ class Combat {
         int monster_count = 2;
     public:
         Combat() = default;
-        void dec_heroCount() { --hero_count; }
+        void dec_heroCount() { 
+            --hero_count; 
+            if (hero_count == 0) {
+                cout << "Hero team has been defeated." << endl;
+                cout << "Game Over" << endl;
+                exit(1);
+            }
+        }
         void dec_monsterCount() { --monster_count; }
         void set_heroCount(int newCount) { hero_count = newCount; }
         void set_monsterCount(int newCount) { monster_count = newCount; }
@@ -134,7 +147,7 @@ class Heroes : public Actors {
         int make_move(Actors *opponent) override {
             cout << "Choose a weapon to use:" << endl;
             for (size_t i = 0; i < inventory.size(); i++) {
-                cout << "(" << i+1 << ") " << inventory.at(i).name << " +" << inventory.at(i).damage << " av" << endl;
+                cout << "(" << i+1 << ") " << setw(15) << left << inventory.at(i).name << " +" << inventory.at(i).damage << " av" << endl;
             }
             int userChoice = 0;
             while (true) {
@@ -148,16 +161,16 @@ class Heroes : public Actors {
                         //attack loading screen
                         cout << this->get_name() << flush;
                         for (size_t i = 0; i < 3; i++) {
-                            sleep(1);
+                            usleep(300000);
                             cout << "  >  " << flush;
                         }
-                        sleep(1);
+                        usleep(300000);
                         cout << opponent->get_name() << endl;
-                        sleep(1);
+                        usleep(300000);
                         if (system("clear")) {}
                         //summarize attack and calculate damage done to opponent
                         cout << "~ " << name << " has used a " << inventory.at(i).name << " against " << opponent->get_name() << " ~" << endl << endl;
-                        sleep(2);
+                        sleep(1);
                         int damage_taken = inventory.at(i).damage + attack_value - opponent->get_defense();
                         opponent->set_health(opponent->get_health() - damage_taken);
                         return opponent->get_health();
@@ -217,16 +230,16 @@ class Monsters : public Actors {
             //attack loading screen
             cout << this->get_name() << flush;
             for (size_t i = 0; i < 3; i++) {
-                sleep(1);
+                usleep(300000);
                 cout << "  >  " << flush;
             }
-            sleep(1);
+            usleep(300000);
             cout << opponent->get_name() << endl;
-            sleep(1);
+            usleep(300000);
             if (system("clear")) {}
             //summarize attack and calculate damage done to opponent
             cout << "~ " << name << " has used a " << inventory.at(choice).name << " against " << opponent->get_name() << " ~" << endl << endl;
-            sleep(2);
+            sleep(1);
             int damage_taken = inventory.at(choice).damage + attack_value - opponent->get_defense();
             opponent->set_health(opponent->get_health() - damage_taken);
             return opponent->get_health();
@@ -283,11 +296,11 @@ class Goblin : public Monsters {
     public:
         Goblin() {}
         Goblin(int n_speed) : Monsters(n_speed) {
-            attack_value = 10;
-            defense_value = 11;
+            attack_value = 7;
+            defense_value = 8;
             type = "Monster";
             name = "GOBLIN";
-            inventory = { Item{"Spear", 29}, Item{"Pike", 26}, Item{"Stink Bomb", 23} };
+            inventory = { Item{"Spear", 26}, Item{"Pike", 23}, Item{"Stink Bomb", 20} };
         }
         void print_stats() const override {
             cout << "GOBLIN" << endl;
@@ -300,11 +313,11 @@ class Orc : public Monsters {
     public:
         Orc() {}
         Orc(int n_speed) : Monsters(n_speed) {
-            attack_value = 13;
-            defense_value = 5;
+            attack_value = 11;
+            defense_value = 4;
             type = "Monster";
             name = "ORC";
-            inventory = { Item{"Curved Sword", 31}, Item{"Battle Ax", 28}, Item{"Club", 25} };
+            inventory = { Item{"Curved Sword", 27}, Item{"Battle Ax", 23}, Item{"Club", 20} };
         }
         void print_stats() const override {
             cout << "ORC" << endl;
